@@ -10,25 +10,27 @@ tracks = requests.get('https://api.soundcloud.com/tracks?client_id=' + client_id
 result = []
 favoritersIds = []
 
-for track in tracks:
+for count, track in enumerate(tracks):
     params = {'limit': '200', 'linked_partitioning': '1'}
 
     favoriters = requests.get('https://api.soundcloud.com/tracks/' + str(track['id']) + '/favoriters?client_id=' + client_id, params).json()
 
     for i in range(0, 10):
-        if 'next_href' not in favoriters.keys():
+        if 'next_href' not in favoriters.keys() or 'collection' not in favoriters.keys():
             break
+
         next_href = favoriters['next_href']
         favoriters = requests.get(next_href).json()
 
         favoritersIds = favoritersIds + ([favoriter['id'] for favoriter in favoriters['collection']])
-        print(i)
+
 
     trackInfo = {}
     trackInfo['id'] = track['id']
     trackInfo['genre'] = track['genre']
     trackInfo['favoriters'] = favoritersIds
     result.append(trackInfo)
+    print(len(result))
     time.sleep(0.05)
 
 
