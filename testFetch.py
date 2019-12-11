@@ -8,7 +8,6 @@ params = { 'limit' : '50', 'genres': currentGenre }
 tracks = requests.get('https://api.soundcloud.com/tracks?client_id=' + client_id, params).json()
 
 result = []
-favoritersIds = []
 
 for count, track in enumerate(tracks):
     params = {'limit': '200', 'linked_partitioning': '1'}
@@ -22,7 +21,7 @@ for count, track in enumerate(tracks):
         next_href = favoriters['next_href']
         favoriters = requests.get(next_href).json()
 
-        favoritersIds = favoritersIds + ([favoriter['id'] for favoriter in favoriters['collection']])
+        favoritersIds = ([favoriter['id'] for favoriter in favoriters['collection']])
 
 
     trackInfo = {}
