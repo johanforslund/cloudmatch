@@ -3,7 +3,7 @@ import time
 import json
 
 client_id = 'csSEELZJ9CZQAJnUIssLDhWdk2oSkPC9'
-currentGenre = 'rock'
+currentGenre = 'pop'
 params = { 'limit' : '20', 'genres': currentGenre }
 tracks = requests.get('https://api.soundcloud.com/tracks?client_id=' + client_id, params).json()
 
@@ -22,7 +22,7 @@ for count, track in enumerate(tracks):
         favoriters = requests.get(next_href).json()
 
         favoritersIds = ([favoriter['id'] for favoriter in favoriters['collection']])
-        
+
         if i%10 == 0:
             print('Inner loop: ' + str(i))
 
