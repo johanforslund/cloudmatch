@@ -55,5 +55,5 @@ for i in range(0, 1):
         result.append(user)
     break
 
-with open(currentGenre + '.json', 'w', encoding='utf8') as json_file:
+with open('./data/' + currentGenre + '.json', 'w', encoding='utf8') as json_file:
     json.dump(result, json_file, ensure_ascii=False)
