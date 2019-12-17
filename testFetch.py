@@ -16,6 +16,8 @@ favoriters = requests.get('https://api.soundcloud.com/tracks/' + str(track['id']
 
 params = {'limit': '200'}
 
+trackProperties = ('id', 'likes_count', 'reposts_count', 'genre', 'permalink_url', 'title', 'description', 'streamable', 'stream_url')
+
 for i in range(0, 1):
     if 'next_href' not in favoriters.keys() or 'collection' not in favoriters.keys():
         break
@@ -24,14 +26,20 @@ for i in range(0, 1):
     favoriters = requests.get(next_href).json()
 
     for favoriter in favoriters['collection']:
-        user = {'id': favoriter['id']}
-        favoriteTracks = requests.get('https://api.soundcloud.com/users/' + str(favoriter['id']) + '/favorites?client_id=' + client_id, params).json()
+        user = {'user_id': favoriter['id']}
+        favoriteTracks = requests.get('https://api.soundcloud.com/users/' + str(favoriter['id']) + '/favorites?client_id=' + client_id, params)
+        if favoriteTracks:
+            favoriteTracks = favoriteTracks.json()
+        else:
+            break
 
         favoriteTracksList = []
 
         for favoriteTrack in favoriteTracks:
+            if not all (k in favoriteTrack for k in trackProperties):
+                continue
             favoriteTrackInfo = {}
-            favoriteTrackInfo['id'] = favoriteTrack['id']
+            favoriteTrackInfo['track_id'] = favoriteTrack['id']
             favoriteTrackInfo['likes_count'] = favoriteTrack['likes_count']
             favoriteTrackInfo['reposts_count'] = favoriteTrack['reposts_count']
             favoriteTrackInfo['genre'] = favoriteTrack['genre']
@@ -45,7 +53,6 @@ for i in range(0, 1):
         user['favoriteTracks'] = favoriteTracksList
 
         result.append(user)
-        break
     break
 
 with open(currentGenre + '.json', 'w', encoding='utf8') as json_file:
