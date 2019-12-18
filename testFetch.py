@@ -60,5 +60,5 @@ for i in range(0, 2):
     next_href = favoriters['next_href']
     favoriters = requests.get(next_href).json()
 
-with open(current_genre + '.json', 'w', encoding='utf8') as json_file:
+with open('./data/' + current_genre + '.json', 'w', encoding='utf8') as json_file:
     json.dump(result, json_file, ensure_ascii=False)
