@@ -3,7 +3,7 @@ import time
 import json
 
 client_id = 'cEIhboHJ92pcRNyYQhmg5gYgL69kQlrM'
-current_genre = 'pop'
+current_genre = 'rock'
 
 result = []
 
@@ -14,11 +14,12 @@ track = tracks[-1]
 
 params = {'limit': '200', 'linked_partitioning': '1'}
 
-track_properties = ('id', 'likes_count', 'comment_count', 'genre', 'permalink_url', 'title', 'description', 'streamable', 'stream_url')
+track_properties = ('id', 'likes_count', 'comment_count', 'genre', 'permalink_url', 'title', 'stream_url')
 
 favoriters = requests.get('https://api.soundcloud.com/tracks/' + str(track['id']) + '/favoriters?client_id=' + client_id, params).json()
 
 for i in range(0, 25):
+    print(i)
     if 'collection' not in favoriters.keys():
         break
 
