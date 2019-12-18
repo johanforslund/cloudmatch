@@ -1,33 +1,39 @@
 import pandas as pd
 import json
+import re
 
-X = pd.read_json('./data/pop.json')
+def clean_genre(s):
+    #TODO: also remove "and" and switch "raphiphop" to "hiphoprap"
+    regex = re.compile('[^a-zA-Z]')
+    s = regex.sub('', s)
+    return s.lower()
+
+X = pd.read_json('./data/rock.json')
+genres = pd.read_json('./data/genres.json')['genres']
 users = X["favorite_tracks"]
 
-rockCount = 0
-popCount = 0
-rapCount = 0
+genres = genres.values.tolist()
 
+numOfGenres = len(genres)
+meanGenre = [0] * numOfGenres
 midGenre = []
-
 
 for user in users:
     for track in user:
-        if track['genre'] == 'Rock':
-            rockCount += 1
-        if track['genre'] == 'Pop':
-            popCount += 1
-        if track['genre'] == 'Hip-hop & Rap':
-            rapCount += 1
+        if not track['genre']:
+            continue
+        genre = clean_genre(track['genre'])
+        try:
+            idx = genres.index(genre)
+        except ValueError:
+            continue
+        meanGenre[idx] += 1
 
+    normalizer = sum(meanGenre)
+    for i in range(0,len(meanGenre)):
+        meanGenre[i] = meanGenre[i] / normalizer
+    midGenre.append(meanGenre)
 
-    normalizer = (rockCount + popCount + rapCount)
-    currentGenre = [rockCount/normalizer, popCount/normalizer, rapCount/normalizer]
-    midGenre.append(currentGenre)
-    rockCount = 0
-    popCount = 0
-    rapCount = 0
-
-with open('popvsrockvsrap.json', 'w', encoding='utf8') as json_file:
+with open('./data/rockSplit.json', 'w', encoding='utf8') as json_file:
     json.dump(midGenre, json_file, ensure_ascii=False)
 

@@ -3,7 +3,7 @@ import time
 import json
 
 client_id = 'cEIhboHJ92pcRNyYQhmg5gYgL69kQlrM'
-current_genre = 'pop'
+current_genre = 'rock'
 
 result = []
 
