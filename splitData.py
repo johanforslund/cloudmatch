@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 X = pd.read_json('./data/pop.json')
-users = X["favoriteTracks"]
+users = X["favorite_tracks"]
 
 rockCount = 0
 popCount = 0
