@@ -14,38 +14,41 @@ track = tracks[-1]
 
 params = {'limit': '200', 'linked_partitioning': '1'}
 
-track_properties = ('id', 'likes_count', 'comment_count', 'genre', 'permalink_url', 'title', 'description', 'streamable', 'stream_url')
+track_properties = ('id', 'likes_count', 'comment_count', 'genre', 'permalink_url', 'title', 'stream_url')
 
 favoriters = requests.get('https://api.soundcloud.com/tracks/' + str(track['id']) + '/favoriters?client_id=' + client_id, params).json()
 
 for i in range(0, 25):
-    if 'collection' not in favoriters.keys():
-        break
+    print(i)
 
-    for favoriter in favoriters['collection']:
-        user = {'user_id': favoriter['id']}
-        favorite_tracks = requests.get('https://api.soundcloud.com/users/' + str(favoriter['id']) + '/favorites?client_id=' + client_id, {'limit': '200'})
+    if 'collection' in favoriters.keys():
+        for favoriter in favoriters['collection']:
+            user = {'user_id': favoriter['id']}
+            favorite_tracks = requests.get('https://api.soundcloud.com/users/' + str(favoriter['id']) + '/favorites?client_id=' + client_id, {'limit': '200'})
 
-        if favorite_tracks:
-            favorite_tracks = favorite_tracks.json()
-        else:
-            break
+            if favorite_tracks:
+                favorite_tracks = favorite_tracks.json()
+            else:
+                break
 
-        favorite_tracks_list = []
+            favorite_tracks_list = []
 
-        for favorite_track in favorite_tracks:
-            if not all (k in favorite_track for k in track_properties):
-                continue
-            favorite_track_info = {k: favorite_track[k] for k in track_properties}
-            favorite_tracks_list.append(favorite_track_info)
+            for favorite_track in favorite_tracks:
+                if not all (k in favorite_track for k in track_properties):
+                    continue
+                favorite_track_info = {k: favorite_track[k] for k in track_properties}
+                favorite_tracks_list.append(favorite_track_info)
 
-        user['favorite_tracks'] = favorite_tracks_list
+            user['favorite_tracks'] = favorite_tracks_list
 
-        result.append(user)
+            result.append(user)
 
-        time.sleep(0.5)
+            time.sleep(0.5)
+    else:
+        print("Collection not found")
 
     if 'next_href' not in favoriters.keys():
+        print("Next_href not found")
         break
 
     next_href = favoriters['next_href']
