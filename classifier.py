@@ -2,14 +2,21 @@ from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import pandas as pd
 
-X = pd.read_json('./data/rockSplit.json')
-Y = pd.read_json('./data/rock.json')
+import random as ran
+
+X = pd.read_json('./data/popSplit.json')
+Y = pd.read_json('./data/pop.json')
 
 #X_test = [[0] * 126]
-X_test = np.random.dirichlet(np.ones(126), size=1)
+#X_test = np.random.dirichlet(np.ones(126)*1000, size=1)
+X_test = [ran.random() for i in range(1,127)]
+s = sum(X_test)
+X_test = [i/s for i in X_test]
+X_test = [X_test]
+print(X_test)
 
-k = 2
-knn = NearestNeighbors(n_neighbors=k)
+k = 10
+knn = NearestNeighbors(n_neighbors=k, radius=10)
 knn.fit(X)
 pred = knn.kneighbors(X_test)
 print(pred)
@@ -29,7 +36,7 @@ for i in range(0,k):
 maxScore = {'id': 0, 'score': 0}
 
 for track in rec_tracks:
-    if rec_tracks[track] > maxScore['score']:
+    if rec_tracks[track] > maxScore['score'] and rec_tracks[track] != 10:
         maxScore['score'] = rec_tracks[track]
         maxScore['id'] = track
 
