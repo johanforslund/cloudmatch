@@ -23,6 +23,9 @@ for i in range(0, 25):
 
     if 'collection' in favoriters.keys():
         for favoriter in favoriters['collection']:
+            if favoriter['public_favorites_count'] < 100:
+                continue
+
             user = {'user_id': favoriter['id']}
             favorite_tracks = requests.get('https://api.soundcloud.com/users/' + str(favoriter['id']) + '/favorites?client_id=' + client_id, {'limit': '200'})
 
