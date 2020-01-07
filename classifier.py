@@ -7,10 +7,17 @@ Y = pd.read_json('./data/pop.json')
 
 X_test = [[0] * 126]
 X_test[0][52] = 1.0
+
 #X_test = np.random.dirichlet(np.ones(126), size=1)
+
+#X_test = [ran.random() for i in range(1,127)]
+#s = sum(X_test)
+#X_test = [i/s for i in X_test]
+#X_test = [X_test]
 
 k = 7
 knn = NearestNeighbors(n_neighbors=k)
+
 knn.fit(X)
 pred = knn.kneighbors(X_test)
 #print(X_test)
