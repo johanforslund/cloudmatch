@@ -2,11 +2,11 @@ from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import pandas as pd
 
-X = pd.read_json('./data/popSplit.json')
-Y = pd.read_json('./data/pop.json')
+X = pd.read_json('./data/rockSplit.json')
+Y = pd.read_json('./data/rock.json')
 
 X_test = [[0] * 126]
-X_test[0][52] = 1.0
+X_test[0][20] = 1.0
 
 #X_test = np.random.dirichlet(np.ones(126), size=1)
 
@@ -15,7 +15,7 @@ X_test[0][52] = 1.0
 #X_test = [i/s for i in X_test]
 #X_test = [X_test]
 
-k = 7
+k = 4
 knn = NearestNeighbors(n_neighbors=k)
 
 knn.fit(X)

@@ -8,18 +8,17 @@ def clean_genre(s):
     s = regex.sub('', s)
     return s.lower()
 
-X = pd.read_json('./data/pop.json')
+X = pd.read_json('./data/jazz.json')
 genres = pd.read_json('./data/genres.json')['genres']
-users = X["favorite_tracks"]
 
 genres = genres.values.tolist()
 
 numOfGenres = len(genres)
 midGenre = []
 
-for user in users:
+for user_id, favorite_tracks in X.itertuples(index=False):
     meanGenre = [0] * numOfGenres
-    for track in user:
+    for track in favorite_tracks:
         if not track['genre']:
             continue
         genre = clean_genre(track['genre'])
@@ -32,8 +31,11 @@ for user in users:
     normalizer = sum(meanGenre)
     for i in range(0,len(meanGenre)):
         meanGenre[i] = meanGenre[i] / normalizer
-    midGenre.append(meanGenre)
 
-with open('./data/popSplit.json', 'w', encoding='utf8') as json_file:
+    result = {user_id: meanGenre}
+    
+    midGenre.append(result)
+
+with open('./data/jazzSplit.json', 'w', encoding='utf8') as json_file:
     json.dump(midGenre, json_file, ensure_ascii=False)
 
