@@ -18,8 +18,9 @@ def clean_genre(s):
     s = regex.sub('', s)
     return s.lower()
 
-X = pd.read_json('./data/split.json')
+X = pd.read_json('./data/splitAll2.json')
 print("Finished reading split")
+#Y = parse_data('./data/combined.json')
 Y = parse_data('./data/combined.json')
 print("Finished reading data")
 
@@ -45,13 +46,12 @@ while True:
     #X_test = [i/s for i in X_test]
     #X_test = [X_test]
 
-    k = 16
+    k = 128
     knn = NearestNeighbors(n_neighbors=k)
 
     knn.fit(X)
     pred = knn.kneighbors(X_test)
     #print(X_test)
-    print(X.iloc[pred[1][0][0]])
     print("Pred")
     print(pred)
     #TODO: add dictionary with track_ids and their number of occurrences
@@ -72,24 +72,25 @@ while True:
                 continue
             if track['likes_count'] > 5000:
                 continue
+            if track['comment_count'] < 3:
+                continue
             if track['id'] in rec_tracks:
-                rec_tracks[track['id']] += 1
+                genre = clean_genre(track['genre'])
+                genreIndex = genres.index(genre)
+                rec_tracks[track['id']] += 1 + 0.5*X_test[0][genreIndex]
             else:
                 rec_tracks[track['id']] = 1
 
-    maxScore = {'id': 0, 'score': 0}
+    maxScores = sorted(rec_tracks.items(), key=lambda x: x[1], reverse=True)
 
-    for track in rec_tracks:
-        if rec_tracks[track] > maxScore['score'] and rec_tracks[track] < k: # Improve this
-            maxScore['score'] = rec_tracks[track]
-            maxScore['id'] = track
-
-    for i in range(0,k):
-        for track in Y[1][pred[1][0][i]]:
-            if track['id'] == maxScore['id']:
-                print(track['permalink_url'])
-                print(maxScore['score'])
-                print(track['id'])
-                pass
+    for j in range(0, 10):
+        for i in range(0,k):
+            for track in Y[1][pred[1][0][i]]:
+                if track['id'] == maxScores[j][0]:
+                    print(track['permalink_url'])
+                    print(maxScores[j][1])
+                    print(track['id'])
+                    print(track['genre'])
+                    break
 
 #print(maxScore)
