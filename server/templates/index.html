@@ -1,0 +1,8 @@
+<doctype html>
+<html>
+	{% for item in sorted_array%}
+	{% for artist in item['items']%}
+	<p> {{ artist['genres'] }} </p>
+	{% endfor %}
+	{% endfor %}
+</html>

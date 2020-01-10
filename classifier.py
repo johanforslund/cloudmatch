@@ -77,7 +77,7 @@ while True:
             if track['id'] in rec_tracks:
                 genre = clean_genre(track['genre'])
                 genreIndex = genres.index(genre)
-                rec_tracks[track['id']] += 1 + 0.5*X_test[0][genreIndex]
+                rec_tracks[track['id']] += 1 + 0.25*X_test[0][genreIndex]
             else:
                 rec_tracks[track['id']] = 1
 
