@@ -2,8 +2,13 @@ import json
 from flask import Flask, request, redirect, g, render_template
 import requests
 import pandas as pd
+import numpy as np
 import re
+import ijson
 from urllib.parse import quote
+from sklearn.neighbors import NearestNeighbors
+import classifier
+import config
 
 # Authentication Steps, paramaters, and responses are defined at https://developer.spotify.com/web-api/authorization-guide/
 # Visit this url to see all the steps, parameters, and expected response.
@@ -12,8 +17,8 @@ from urllib.parse import quote
 app = Flask(__name__)
 
 #  Client Keys
-CLIENT_ID = ""
-CLIENT_SECRET = ""
+CLIENT_ID = config.CLIENT_ID
+CLIENT_SECRET = config.CLIENT_SECRET
 
 # Spotify URLS
 SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
@@ -39,6 +44,31 @@ auth_query_parameters = {
     # "show_dialog": SHOW_DIALOG_str,
     "client_id": CLIENT_ID
 }
+
+def parse_data(filename):
+    data = []
+    with open(filename, 'rb') as f:
+        for item in ijson.items(f, 'item'):
+            data.append(item)
+    return pd.DataFrame(data)
+
+
+def clean_genre(s):
+    #TODO: also remove "and" and switch "raphiphop" to "hiphoprap"
+    regex = re.compile('[^a-zA-Z]')
+    s = regex.sub('', s)
+    return s.lower()
+
+X = pd.read_json('../data/splitAll2.json')
+print("Finished reading split")
+#Y = parse_data('./data/combined.json')
+Y = parse_data('../data/combined.json')
+print("Finished reading data")
+
+genres = pd.read_json('../data/genres.json')['genres']
+genres = genres.values.tolist()
+
+k = 128
 
 
 @app.route("/")
@@ -82,36 +112,38 @@ def callback():
     # Combine profile and playlist data to display
     display_arr = [profile_data]
 
-    def clean_genre(s):
-        #TODO: also remove "and" and switch "raphiphop" to "hiphoprap"
-        regex = re.compile('[^a-zA-Z]')
-        s = regex.sub('', s)
-        return s.lower()
-
     list_of_genres = [a['genres'] for a in profile_data['items']]
     flat_genres = [item for sublist in list_of_genres for item in sublist]
 
-    genres = pd.read_json('./data/genres.json')['genres']
-    genres = genres.values.tolist()
-
     numOfGenres = len(genres)
 
-    meanGenre = [0] * numOfGenres
+    mean_genre = [0] * numOfGenres
     for genre in flat_genres:
         genre = clean_genre(genre)
         try:
             idx = genres.index(genre)
         except ValueError:
             continue
-        meanGenre[idx] += 1
+        mean_genre[idx] += 1
 
-    normalizer = sum(meanGenre)
+    normalizer = sum(mean_genre)
     if normalizer == 0:
         normalizer = 1
-    for i in range(0,len(meanGenre)):
-        meanGenre[i] = meanGenre[i] / normalizer
+    for i in range(0,len(mean_genre)):
+        mean_genre[i] = mean_genre[i] / normalizer
 
-    print(meanGenre)
+    clf = classifier.Classifier(genres, k)
+    maxScores, pred = clf.classify(mean_genre, X, Y)
+
+    for j in range(0, 10):
+        for i in range(0,k):
+            for track in Y[1][pred[1][0][i]]:
+                if track['id'] == maxScores[j][0]:
+                    print(track['permalink_url'])
+                    print(maxScores[j][1])
+                    print(track['id'])
+                    print(track['genre'])
+                    break
 
     return render_template("index.html", sorted_array=display_arr)
 
