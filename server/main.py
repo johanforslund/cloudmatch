@@ -101,7 +101,6 @@ def callback():
 
     # Auth Step 6: Use the access token to access Spotify API
     authorization_header = {"Authorization": "Bearer {}".format(access_token)}
-
     params = {"limit": "50"}
 
     # Get profile data
@@ -113,7 +112,18 @@ def callback():
     display_arr = [profile_data]
 
     list_of_genres = [a['genres'] for a in profile_data['items']]
-    flat_genres = [item for sublist in list_of_genres for item in sublist]
+    
+    BB = []
+    CC = []
+
+    for ll in list_of_genres:
+        LL = list(set(ll))
+        for kk in LL:
+            BB.append(kk.split())
+        CC.append(BB)
+        BB = []
+
+    flat_genres = [item2 for sublist in CC for item in sublist for item2 in item]
 
     numOfGenres = len(genres)
 
@@ -131,7 +141,6 @@ def callback():
         normalizer = 1
     for i in range(0,len(mean_genre)):
         mean_genre[i] = mean_genre[i] / normalizer
-
     clf = classifier.Classifier(genres, k)
     maxScores, pred = clf.classify(mean_genre, X, Y)
 

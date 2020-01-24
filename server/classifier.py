@@ -39,6 +39,7 @@ class Classifier:
         knn = NearestNeighbors(n_neighbors=self.k)
 
         knn.fit(X)
+
         pred = knn.kneighbors(X_test)
         #print(X_test)
         #print("Pred")
