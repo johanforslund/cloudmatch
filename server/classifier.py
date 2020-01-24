@@ -59,9 +59,9 @@ class Classifier:
                     continue
                 if any(word in track['title'].lower() for word in ['podcast', 'part', 'live']):
                     continue
-                if track['likes_count'] > 5000:
+                if track['likes_count'] > 10000:
                     continue
-                if track['comment_count'] < 3:
+                if track['comment_count'] < 10:
                     continue
                 if track['id'] in rec_tracks:
                     genre = clean_genre(track['genre'])

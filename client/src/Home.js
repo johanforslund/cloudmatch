@@ -11,6 +11,7 @@ function Home() {
           variant="contained"
           color="inherit"
           style={{ backgroundColor: "#1DB954" }}
+          href="https://accounts.spotify.com/authorize?client_id=569291be8d344a19b817ae7d5971d3bb&redirect_uri=http:%2F%2Flocalhost:3000%2Ftracks%2Fcallback&scope=user-top-read&response_type=code"
         >
           Login with Spotify
         </Button>

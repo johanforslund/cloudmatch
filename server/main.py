@@ -1,5 +1,6 @@
 import json
 from flask import Flask, request, redirect, g, render_template
+from flask_cors import CORS, cross_origin
 import requests
 import pandas as pd
 import numpy as np
@@ -10,11 +11,13 @@ from sklearn.neighbors import NearestNeighbors
 import classifier
 import config
 
+
 # Authentication Steps, paramaters, and responses are defined at https://developer.spotify.com/web-api/authorization-guide/
 # Visit this url to see all the steps, parameters, and expected response.
 
-
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 #  Client Keys
 CLIENT_ID = config.CLIENT_ID
@@ -28,9 +31,9 @@ API_VERSION = "v1"
 SPOTIFY_API_URL = "{}/{}".format(SPOTIFY_API_BASE_URL, API_VERSION)
 
 # Server-side Parameters
-CLIENT_SIDE_URL = "http://127.0.0.1"
-PORT = 8080
-REDIRECT_URI = "{}:{}/callback/q".format(CLIENT_SIDE_URL, PORT)
+CLIENT_SIDE_URL = "http://localhost"
+PORT = 3000
+REDIRECT_URI = "{}:{}/tracks/callback".format(CLIENT_SIDE_URL, PORT)
 SCOPE = "playlist-modify-public playlist-modify-private user-top-read"
 STATE = ""
 SHOW_DIALOG_bool = True
@@ -82,22 +85,7 @@ def index():
 @app.route("/callback/q")
 def callback():
     # Auth Step 4: Requests refresh and access tokens
-    auth_token = request.args['code']
-    code_payload = {
-        "grant_type": "authorization_code",
-        "code": str(auth_token),
-        "redirect_uri": REDIRECT_URI,
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-    }
-    post_request = requests.post(SPOTIFY_TOKEN_URL, data=code_payload)
-
-    # Auth Step 5: Tokens are Returned to Application
-    response_data = json.loads(post_request.text)
-    access_token = response_data["access_token"]
-    refresh_token = response_data["refresh_token"]
-    token_type = response_data["token_type"]
-    expires_in = response_data["expires_in"]
+    access_token = request.args['access_token']
 
     # Auth Step 6: Use the access token to access Spotify API
     authorization_header = {"Authorization": "Bearer {}".format(access_token)}
@@ -108,6 +96,8 @@ def callback():
     user_profile_api_endpoint = "{}/me/top/artists".format(SPOTIFY_API_URL)
     profile_response = requests.get(user_profile_api_endpoint, params=params, headers=authorization_header)
     profile_data = json.loads(profile_response.text)
+
+    print(profile_data)
 
     # Combine profile and playlist data to display
     display_arr = [profile_data]
@@ -135,18 +125,21 @@ def callback():
     clf = classifier.Classifier(genres, k)
     maxScores, pred = clf.classify(mean_genre, X, Y)
 
+    result = []
+
     for j in range(0, 10):
         for i in range(0,k):
             for track in Y[1][pred[1][0][i]]:
                 if track['id'] == maxScores[j][0]:
-                    print(track['permalink_url'])
-                    print(maxScores[j][1])
-                    print(track['id'])
-                    print(track['genre'])
+                    #print(track['permalink_url'])
+                    #print(maxScores[j][1])
+                    #print(track['id'])
+                    #print(track['genre'])
+                    result.append(track['stream_url'])
                     break
 
-    return render_template("index.html", sorted_array=display_arr)
+    return {"data": result}
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=PORT)
+    app.run(debug=True, port=8080)

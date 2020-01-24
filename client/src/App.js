@@ -1,5 +1,4 @@
 import React from "react";
-import Button from "@material-ui/core/Button";
 import "./App.css";
 import Home from "./Home";
 import Tracks from "./Tracks";
@@ -9,6 +8,9 @@ function App() {
   return (
     <Router>
       <Switch>
+        <Route path="/tracks/callback">
+          <Tracks />
+        </Route>
         <Route path="/tracks">
           <Tracks />
         </Route>
