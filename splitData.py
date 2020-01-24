@@ -65,6 +65,6 @@ for user_id, favorite_tracks in X.itertuples(index=False):
     
     midGenre.append(meanGenre)
 
-with open('./data/splitAll2.json', 'w', encoding='utf8') as json_file:
+with open('./data/splitAll3.json', 'w', encoding='utf8') as json_file:
     json.dump(midGenre, json_file, ensure_ascii=False)
 

@@ -62,7 +62,7 @@ def clean_genre(s):
     s = regex.sub('', s)
     return s.lower()
 
-X = pd.read_json('../data/splitAll2.json')
+X = pd.read_json('../data/splitAll3.json')
 print("Finished reading split")
 #Y = parse_data('./data/combined.json')
 Y = parse_data('../data/combined.json')
