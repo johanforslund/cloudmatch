@@ -136,7 +136,7 @@ def callback():
 
     result = []
 
-    for j in range(0, 10):
+    for j in range(0, 20):
         for i in range(0,k):
             for track in Y[1][pred[1][0][i]]:
                 if track['id'] == maxScores[j][0]:
